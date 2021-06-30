@@ -1,23 +1,28 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
+import Form from './components/Form';
+import List from './components/List';
+import { headers } from './data';
+import useStyles from './styles/Main';
 
-function App() {
+const App = () => {
+  const classes = useStyles();
+  const [addItem, setAddItem] = useState(false);
+
+  const addListItem = () => {
+
+  }
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <List head={headers.notesHeader} icons={true} addIcons={true} defaultL={true} total={false} />
+      {addItem && <Form />}
+      <div className={classes.button}>
+        <button onClick={() => {
+          setAddItem(true);
+          addListItem();
+        }}>Create note</button>
+      </div>
+      <List head={headers.totalHeader} icons={false} addIcons={false} total={true} />
     </div>
   );
 }
