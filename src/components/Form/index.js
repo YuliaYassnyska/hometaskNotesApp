@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import useStyles from '../../styles/Form';
 import { options } from '../../data';
-// import ListItem from '../ListItem';
+import List from '../List';
 import EditIcon from '@material-ui/icons/Edit';
 import ArchiveIcon from '@material-ui/icons/Archive';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EventNoteRoundedIcon from '@material-ui/icons/EventNoteRounded';
+import { headers } from '../../data';
 
 const Form = () => {
     const classes = useStyles();
@@ -13,16 +14,30 @@ const Form = () => {
     const [dropdown, setDropdown] = useState(false);
     const [value, setValue] = useState({
         name: '',
+        newName: '',
         content: '',
-        listOfNames: [],
-        listOfContents: [],
-        listOfOptions: [],
+        newContent: '',
+        listOfNames: ['Shopping list', 'Shopping list', 'Shopping list', 'Shopping list', 'Shopping list', 'Shopping list', 'Shopping list'],
+        listOfContents: ['Tomatoes, bread', 'Tomatoes, bread', 'Tomatoes, bread', 'Tomatoes, bread', 'Tomatoes, bread', 'Tomatoes, bread', 'Tomatoes, bread'],
+        listOfOptions: ['Task', 'Task', 'Task', 'Task', 'Task', 'Task', 'Task'],
         date: '',
-        listOfDates: [],
+        listOfDates: ['April, 20, 2021', 'April, 20, 2021', 'April, 20, 2021', 'April, 20, 2021', 'April, 20, 2021', 'April, 20, 2021', 'April, 20, 2021'],
         noteDate: '',
         listOfNoteDate: []
-    })
-    const [listItem, setListItem] = useState(0);
+    });
+    const [counter, setCounter] = useState({
+        task: 0,
+        idea: 0,
+        random: 0
+    });
+    const [active, setActive] = useState({
+        task: 0,
+        idea: 0,
+        random: 0
+    });
+    const [listItem, setListItem] = useState(7);
+    const [update, setUpdate] = useState(false);
+    const [edit, setEdit] = useState(true);
 
     const numOfOptions = options.length;
 
@@ -58,7 +73,7 @@ const Form = () => {
     const sumbit = () => {
         var today = new Date();
         var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-        var date = months[(today.getMonth() + 1)] + ', ' + today.getDate() + ', ' + today.getFullYear();
+        var date = months[(today.getMonth())] + ', ' + today.getDate() + ', ' + today.getFullYear();
 
         setValue({ ...value, date: date });
 
@@ -81,41 +96,65 @@ const Form = () => {
         };
     }
 
-
     const getListItem = () => {
-        const deleteItem = () => {
-            const index = [...Array(listItem)].indexOf(item);
-            if (index > -1) {
-                [...Array(listItem)].splice(index, 1);
-            }
-        }
-
         var item = [...Array(listItem)].map((_, index) => {
-            // return <ListItem key={index}
-            //     name={value.listOfNames[index]}
-            //     created={value.date}
-            //     option={value.listOfOptions[index]}
-            //     content={value.listOfContents[index]}
-            //     date={value.noteDate}
-            //     addIcons={true}
-            //     deleteItem={deleteItem()}
-            // />
+
             return <><div className={classes.wrappers}>
                 <EventNoteRoundedIcon />
                 <div className={classes.textContainer}>
-                    <div className={classes.text}>{value.listOfNames[index]}</div>
-                    <div className={classes.text}>{value.date}</div>
+                    {update ? <input
+                        onChange={(event) => {
+                            setEdit(true);
+                            var newValue = event.currentTarget.value;
+                            value.listOfNames[index] = newValue;
+                            return setValue({ ...value, newName: newValue })
+                        }}
+                        value={edit ? value.newName : value.listOfNames[index]} /> :
+                        <div className={classes.text}>{value.listOfNames[index]}</div>}
+                    <div className={classes.text}>{value.listOfDates[index]}</div>
                     <div className={classes.text}>{value.listOfOptions[index]}</div>
-                    <div className={classes.text}>{value.listOfContents[index]}</div>
+                    {update ? <input
+                        onChange={(e) => {
+                            setEdit(true);
+                            var newValue = e.currentTarget.value;
+                            value.listOfContents[index] = newValue;
+                            return setValue({ ...value, newContent: newValue })
+                        }}
+                        value={edit ? value.newContent : value.listOfContents[index]} /> :
+                        <div className={classes.text}>{value.listOfContents[index]}</div>}
                     <div className={classes.text}>{value.noteDate}</div>
+                    {update && <button onClick={() => setUpdate(false)}>Save</button>}
                 </div><div className={classes.icons}>
-                    <EditIcon />
-                    <ArchiveIcon />
+                    <div onClick={() => {
+                        setUpdate(true);
+                    }}>
+                        <EditIcon />
+                    </div>
+                    <div onClick={() => {
+                        if (value.listOfOptions[index] === 'Task') {
+                            setCounter({ ...counter, task: counter.task + 1 })
+                        } else if (value.listOfOptions[index] === 'Idea') {
+                            setCounter({ ...counter, idea: counter.idea + 1 })
+                        } else {
+                            setCounter({ ...counter, random: counter.random + 1 })
+                        }
+                        if (index > -1) {
+                            value.listOfNames.splice(index, 1) &&
+                                value.listOfOptions.splice(index, 1) &&
+                                value.listOfContents.splice(index, 1) &&
+                                value.listOfDates.slice(index, 1) &&
+                                [...Array(listItem)].splice(index, 1)
+                        }
+                        setListItem(listItem - 1);
+                    }}>
+                        <ArchiveIcon />
+                    </div>
                     <div onClick={() => {
                         if (index > -1) {
                             value.listOfNames.splice(index, 1) &&
                                 value.listOfOptions.splice(index, 1) &&
                                 value.listOfContents.splice(index, 1) &&
+                                value.listOfDates.slice(index, 1) &&
                                 [...Array(listItem)].splice(index, 1)
                         }
                         setListItem(listItem - 1);
@@ -123,19 +162,34 @@ const Form = () => {
                         <DeleteIcon />
                     </div>
                 </div>
-            </div></>
+            </div>
+            </>
         })
 
         return item
     }
 
+    const activeItems = () => {
+        return [...Array(listItem)].forEach((_, index) => {
+            index = listItem;
+            if (value.listOfOptions[index] === 'Task') {
+                setActive({ ...active, task: active.task + 1 })
+            } else if (value.listOfOptions[index] === 'Idea') {
+                setActive({ ...active, idea: active.idea + 1 })
+            } else if (value.listOfOptions[index] === 'Random Thought') {
+                setActive({ ...active, random: active.random + 1 })
+            }
+        })
+    }
 
-    return <div className={classes.container}>
+
+
+    return <><div className={classes.container}>
         {getListItem()}
         <div className={classes.wrapper}>
             <div className={classes.line}>
                 <div className={classes.title}>Name:</div>
-                <input onChange={(event) => getName(event)} />
+                <input onChange={(event) => getName(event)} value={value.name} />
             </div>
             <div className={classes.line}>
                 <div className={classes.title}>Category:</div>
@@ -145,12 +199,28 @@ const Form = () => {
             </div>
             <div className={classes.line}>
                 <div className={classes.title}>Content:</div>
-                <input onChange={(e) => getContent(e)} />
+                <input onChange={(e) => getContent(e)} value={value.content} />
             </div>
             {dropdown && <div className={classes.dropdown}>{getOption()}</div>}
         </div>
-        <button className={classes.button} onClick={() => sumbit()}>Add</button>
+        <button className={classes.button} onClick={() => {
+            sumbit();
+            activeItems();
+        }}>Create note</button>
     </div>
+        <List
+            head={headers.totalHeader}
+            icons={false}
+            addIcons={false}
+            total={true}
+            taskCounter={counter.task}
+            ideaCounter={counter.idea}
+            randomCounter={counter.random}
+            tasks={active.task}
+            ideas={active.idea}
+            random={active.random}
+        />
+    </>
 }
 
 export default Form;

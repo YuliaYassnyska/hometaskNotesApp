@@ -43,7 +43,6 @@ export default makeStyles((theme) => ({
         marginBottom: '1rem',
         justifyContent: 'center'
     },
-
     wrappers: {
         display: 'flex',
         flexDirection: 'row',

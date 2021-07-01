@@ -4,50 +4,40 @@ import EditIcon from '@material-ui/icons/Edit';
 import ArchiveIcon from '@material-ui/icons/Archive';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EventNoteRoundedIcon from '@material-ui/icons/EventNoteRounded';
-import { defaultList, options } from '../../data';
+import { options } from '../../data';
 
 const ListItem = (props) => {
-    const { addIcons, defaultL, total } = props;
+    const { addIcons, total, taskCounter, ideaCounter, randomCounter, tasks, ideas, random } = props;
     const classes = useStyles();
-    const num = 7;
 
-    // const deleteItem = () => {
-    //     const index = [...Array(listItem)].indexOf();
-    //     if (index > -1) {
-    //         [...Array(listItem)].splice(index, 1);
-    //     }
-    // }
-
-    const getDefList = () => {
-        return [...Array(num)].map((_, index) => {
-            return <>
-                <div className={classes.wrapper} key={index}>
-                    <EventNoteRoundedIcon />
-                    <div className={classes.textContainer}>
-                        <div className={classes.text}>{defaultList.name}</div>
-                        <div className={classes.text}>{defaultList.created}</div>
-                        <div className={classes.text}>{defaultList.option}</div>
-                        <div className={classes.text}>{defaultList.content}</div>
-                        <div className={classes.text}></div>
-                    </div>
-                    {addIcons && <div className={classes.icons}>
-                        <EditIcon />
-                        <ArchiveIcon />
-                        <DeleteIcon />
-                    </div>}
-                </div>
-            </>
-        })
-    }
-
-    return <>{defaultL && getDefList()}
+    return <>
         <>
-            {total && <>{options.map((el, index) => {
+            {total && <>{options.map((_, index) => {
+                const getArchive = () => {
+                    if (options[index] === 'Task') {
+                        return <div>{taskCounter}</div>
+                    } else if (options[index] === 'Idea') {
+                        return <div>{ideaCounter}</div>
+                    } else {
+                        return <div>{randomCounter}</div>
+                    }
+                }
+
+                const getActive = () => {
+                    if (options[index] === 'Task') {
+                        return <div>{tasks}</div>
+                    } else if (options[index] === 'Idea') {
+                        return <div>{ideas}</div>
+                    } else {
+                        return <div>{random}</div>
+                    }
+                }
+
                 return <div className={classes.wrapper} key={index}>
                     <EventNoteRoundedIcon />
                     <div className={classes.text}>{options[index]}</div>
-                    <div className={classes.text}>0</div>
-                    <div className={classes.text}>0</div>
+                    <div className={classes.text}>{getActive()}</div>
+                    <div className={classes.text}>{getArchive()}</div>
                     {addIcons && <div className={classes.icons}>
                         <EditIcon />
                         <ArchiveIcon />
